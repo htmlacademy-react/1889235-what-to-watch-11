@@ -8,7 +8,7 @@ import App from './components/app/app';
 import { store } from './store/store';
 
 export type Mocks = {
-  filmCard: Film;
+  film: Film;
   reviews: Review[];
 }
 
@@ -17,7 +17,7 @@ const root = ReactDOM.createRoot(
 );
 
 const mocks: Mocks = {
-  filmCard: filmsMock[2],
+  film: filmsMock[2],
   reviews: reviewsMock,
 };
 
@@ -25,7 +25,7 @@ root.render(
   <React.StrictMode>
     <Provider store={store}>
       <App
-        filmCard={mocks.filmCard}
+        filmCard={mocks.film}
         reviews={mocks.reviews}
       />
     </Provider>

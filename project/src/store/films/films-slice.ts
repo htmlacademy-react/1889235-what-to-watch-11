@@ -1,6 +1,6 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
-import { GenresEnum } from '../../const';
+import { Genre } from '../../const';
 import { filmsMock } from '../../mocks/films';
 import { Film } from '../../types/types';
 
@@ -26,7 +26,7 @@ export const filmsSlice = createSlice({
       const newGenre = action.payload;
       state.genre = newGenre;
       state.films =
-        newGenre === GenresEnum.AllGenres
+        newGenre === Genre.AllGenres
           ? filmsMock
           : filmsMock.filter((film) => film.genre === newGenre);
     },

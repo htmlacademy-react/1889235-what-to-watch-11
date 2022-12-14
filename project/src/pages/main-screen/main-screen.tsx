@@ -3,7 +3,9 @@ import { Film } from '../../types/types';
 import Logo from '../../components/logo/logo';
 import Footer from '../../components/footer/footer';
 import FilmsList from '../../components/films-list/films-list';
-import { GenresList } from '../../components/genres-list/genres';
+import { GenresList } from '../../components/genres-list/genres-list';
+import { useNavigate } from 'react-router-dom';
+import { AppRoute } from '../../const';
 
 export type MainScreenProps = {
   filmCard: Film;
@@ -11,6 +13,7 @@ export type MainScreenProps = {
 }
 
 export default function MainScreen({ filmCard, films }: MainScreenProps): JSX.Element {
+  const navigate = useNavigate();
   return (
     <>
       <section className="film-card">
@@ -51,7 +54,7 @@ export default function MainScreen({ filmCard, films }: MainScreenProps): JSX.El
               </p>
 
               <div className="film-card__buttons">
-                <button className="btn btn--play film-card__button" type="button">
+                <button onClick={() => navigate(`${AppRoute.Player}/${filmCard.id}`)} className="btn btn--play film-card__button" type="button">
                   <svg viewBox="0 0 19 19" width="19" height="19">
                     <use xlinkHref="#play-s"></use>
                   </svg>
@@ -77,10 +80,6 @@ export default function MainScreen({ filmCard, films }: MainScreenProps): JSX.El
 
           <div className="catalog__films-list">
             <FilmsList films={films} />
-          </div>
-
-          <div className="catalog__more">
-            <button className="catalog__button" type="button">Show more</button>
           </div>
         </section>
         <Footer />

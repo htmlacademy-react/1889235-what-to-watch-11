@@ -1,6 +1,7 @@
 import { Film } from '../../types/types';
 import { BaseSyntheticEvent, useState } from 'react';
 import FilmCard from '../film-card/film-card';
+// import ShowMore from '../show-more/show-more';
 
 export type FilmsListProps = {
   films: Film[];

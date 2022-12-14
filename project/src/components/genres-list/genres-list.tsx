@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { getFilmsByGenre } from '../../store/films/films-slice';
 import { Film } from '../../types/types';
 import { Link } from 'react-router-dom';
-import { GenresEnum } from '../../const';
+import { Genre } from '../../const';
 
 type GenresListProps = {
   // selectedGenre: string;
@@ -11,10 +11,9 @@ type GenresListProps = {
 }
 
 export function GenresList({ films }: GenresListProps) {
-  // useSelector((state: RootState) => state.films.films);
   const dispatch = useDispatch();
-  const selectGenre = ((genre: string) => () => { dispatch(getFilmsByGenre(genre)); });
-  const genres = films.map((film) => (film.genre));
+  const selectGenre = ((genre: string) => () => dispatch(getFilmsByGenre(genre)));
+  const genres = films.map((film) => film.genre);
   const uniqueGenres = [...new Set(genres)];
 
   useEffect(() => {
@@ -27,7 +26,7 @@ export function GenresList({ films }: GenresListProps) {
         <Link
           to="#"
           className="catalog__genres-link"
-          onClick={selectGenre(GenresEnum.AllGenres)}
+          onClick={selectGenre(Genre.AllGenres)}
         >
           All genres
         </Link>

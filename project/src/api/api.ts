@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const serverUrl = 'https://...';
-const baseAxios = axios.create({
+const baseApi = axios.create({
   baseURL: serverUrl,
 });
 
-export default baseAxios;
+export default baseApi;

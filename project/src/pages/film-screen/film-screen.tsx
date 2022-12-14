@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { Film } from '../../types/types';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../const';
 import Logo from '../../components/logo/logo';
 import Footer from '../../components/footer/footer';
@@ -13,6 +13,7 @@ export type FilmScreenProp = {
 
 export default function FilmScreen({ films }: FilmScreenProp): JSX.Element {
 
+  const navigate = useNavigate();
   const params = useParams();
   const film = films.find((item: Film) => item.id.toString() === params.id);
   if (!film) {
@@ -58,7 +59,7 @@ export default function FilmScreen({ films }: FilmScreenProp): JSX.Element {
               </p>
 
               <div className="film-card__buttons">
-                <button className="btn btn--play film-card__button" type="button">
+                <button onClick={() => navigate(`${AppRoute.Player}/${film.id}`)} className="btn btn--play film-card__button" type="button">
                   <svg viewBox="0 0 19 19" width="19" height="19">
                     <use xlinkHref="#play-s"></use>
                   </svg>

@@ -14,7 +14,7 @@ export enum AuthorizationStatus {
 }
 
 
-export enum GenresEnum {
+export enum Genre {
   AllGenres = 'AllGenres',
   Comedy = 'Comedy',
   Crime = 'Crime',
