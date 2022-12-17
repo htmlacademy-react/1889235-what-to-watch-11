@@ -1,9 +1,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthorizationStatus, AppRoute } from '../../const';
-import { Film, Review } from '../../types/types';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { fetchFilms, selectFimsByGenre } from '../../store/films/films-slice';
 import MainScreen from '../../pages/main-screen/main-screen';
 import LoginScreen from '../../pages/login-screen/login-screen';
 import MyListScreen from '../../pages/my-list-screen/my-list-screen';
@@ -13,13 +13,15 @@ import PlayerScreen from '../../pages/player-screen/player-screen';
 import NotFoundScreen from '../../pages/not-found-screen/not-found-screen';
 import PrivateRoute from '../private-route/private-route';
 
-export type AppScreenProps = {
-  filmCard: Film;
-  reviews: Review[];
-}
+export default function App(): JSX.Element {
+  const filmsByGenre = useSelector(selectFimsByGenre);
+  const filmCard = filmsByGenre[0];
 
-export default function App({ filmCard, reviews, }: AppScreenProps): JSX.Element {
-  const films = useSelector((state: RootState) => state.films.films);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dispatch<any>(fetchFilms());
+  }, [dispatch]);
 
   return (
     <HelmetProvider>
@@ -28,10 +30,13 @@ export default function App({ filmCard, reviews, }: AppScreenProps): JSX.Element
           <Route
             path={AppRoute.Root}
             element={
-              <MainScreen
-                filmCard={filmCard}
-                films={films}
-              />
+              filmsByGenre && filmsByGenre.length
+                ?
+                <MainScreen
+                  filmCard={filmCard}
+                  films={filmsByGenre}
+                />
+                : null
             }
           />
           <Route
@@ -42,25 +47,25 @@ export default function App({ filmCard, reviews, }: AppScreenProps): JSX.Element
             path={AppRoute.MyList}
             element={
               <PrivateRoute authorizationStatus={AuthorizationStatus.Auth}>
-                <MyListScreen films={films} />
+                <MyListScreen films={filmsByGenre} />
               </PrivateRoute>
             }
           />
           <Route
             path={`${AppRoute.Film}/:id`}
-            element={<FilmScreen films={films} />}
+            element={<FilmScreen films={filmsByGenre} />}
           />
           <Route
             path={`${AppRoute.Film}/:id${AppRoute.AddReview}`}
             element={
               <PrivateRoute authorizationStatus={AuthorizationStatus.Auth}>
-                <AddReviewScreen films={films} />
+                <AddReviewScreen films={filmsByGenre} />
               </PrivateRoute>
             }
           />
           <Route
             path={`${AppRoute.Player}/:id`}
-            element={<PlayerScreen films={films} />}
+            element={<PlayerScreen films={filmsByGenre} />}
           />
           <Route
             path='*'

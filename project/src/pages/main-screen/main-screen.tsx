@@ -1,11 +1,11 @@
 import { Helmet } from 'react-helmet-async';
 import { Film } from '../../types/types';
-import Logo from '../../components/logo/logo';
-import Footer from '../../components/footer/footer';
-import FilmsList from '../../components/films-list/films-list';
 import { GenresList } from '../../components/genres-list/genres-list';
 import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../const';
+import Logo from '../../components/logo/logo';
+import Footer from '../../components/footer/footer';
+import FilmsList from '../../components/films-list/films-list';
 
 export type MainScreenProps = {
   filmCard: Film;

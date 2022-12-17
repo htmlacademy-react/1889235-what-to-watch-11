@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-const serverUrl = 'https://...';
 const baseApi = axios.create({
-  baseURL: serverUrl,
+  baseURL: 'https://11.react.pages.academy/wtw',
+  timeout: 5000,
 });
 
 export default baseApi;
