@@ -1,80 +1,84 @@
-import { Helmet } from 'react-helmet-async';
-import { Film } from '../../types/types';
-import { useParams, Link, useNavigate, Outlet } from 'react-router-dom';
-import { AppRoute, AuthorizationStatus } from '../../const';
 import { useEffect } from 'react';
-import { AppDispatch } from '../../store/store';
-import Logo from '../../components/logo/logo';
-import Footer from '../../components/footer/footer';
+import { Helmet } from 'react-helmet-async';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, Outlet, useNavigate, useParams } from 'react-router-dom';
 import FilmsList from '../../components/films-list/films-list';
+import Footer from '../../components/footer/footer';
+import Logo from '../../components/logo/logo';
 import Spinner from '../../components/spinner/spinner';
+import { AppRoute } from '../../const';
+import { fetchFilm, fetchReviews, fetchSimilarFilms, selectActiveFilm, selectSimilarFilms } from '../../store/active-film-slice';
+import { selectUser } from '../../store/auth-slice';
+import { AppDispatch } from '../../store/store';
+import { selectIsLoading } from '../../store/ui-slice';
+import NotFoundScreen from '../not-found-screen/not-found-screen';
+import UserPanel from '../user-panel/user-panel';
 
-export type FilmScreenProp = {
-  films: Film[];
-}
-
-export default function FilmScreen({ films }: FilmScreenProp): JSX.Element {
+export default function FilmScreen(): JSX.Element {
   const params = useParams();
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch<AppDispatch>();
+  const filmId = params.id && Number.isInteger(+params.id) ? +params.id : undefined;
 
-  const film: Film | null = useAppSelector(getActivefilm);
-  const similar: Film[] = useAppSelector(getSimilarfilms);
-  const isLoading: boolean = useAppSelector(getLoadingStatus);
-  const authStatus: AuthorizationStatus = useAppSelector(getAuthStatus);
+  const activeFilm = useSelector(selectActiveFilm);
+  const similar = useSelector(selectSimilarFilms);
+  const isLoading = useSelector(selectIsLoading);
+  const isLoggedIn = !!useSelector(selectUser);
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    if (film?.id.toString() !== params.id) {
-      dispatch(fetchActiveDataAction(params.id as string));
+    if (filmId && activeFilm?.id !== filmId) {
+      dispatch(fetchFilm(filmId));
+      dispatch(fetchSimilarFilms(filmId));
+      dispatch(fetchReviews(filmId));
     }
-  }, [dispatch, film?.id, params.id]);
+  }, [activeFilm?.id, dispatch, filmId]);
 
-  if (isLoading || (film?.id.toString() !== params.id)) {
-    return (
-      <Spinner />
-    );
-  }
+  if (isLoading) { return <Spinner />; }
+  if (!filmId || !activeFilm) { return <NotFoundScreen />; }
 
   return (
     <div>
       {
-        film && (
+        activeFilm && (
           <>
-            <section className="film-card film-card--full" style={{ background: film.backgroundColor }}>
+            <section className="film-card film-card--full" style={{ background: activeFilm.backgroundColor }}>
               <Helmet>
-                <title>{film.name}</title>
+                <title>{activeFilm.name}</title>
               </Helmet>
               <div className="film-card__hero">
                 <div className="film-card__bg">
-                  <img src={film?.backgroundImage} alt={film?.name} />
+                  <img src={activeFilm.backgroundImage} alt={activeFilm.name} />
                 </div>
 
                 <h1 className="visually-hidden">WTW</h1>
 
                 <header className="page-header film-card__head">
                   <Logo />
-                  <User />
+                  <UserPanel />
                 </header>
 
                 <div className="film-card__wrap">
                   <div className="film-card__desc">
-                    <h2 className="film-card__title">{film?.name}</h2>
+                    <h2 className="film-card__title">{activeFilm.name}</h2>
                     <p className="film-card__meta">
-                      <span className="film-card__genre">{film?.genre}</span>
-                      <span className="film-card__year">{film?.released}</span>
+                      <span className="film-card__genre">{activeFilm.genre}</span>
+                      <span className="film-card__year">{activeFilm.released}</span>
                     </p>
 
                     <div className="film-card__buttons">
-                      <button onClick={() => navigate(`${AppRoute.Player}/${film?.id}`)} className="btn btn--play film-card__button" type="button">
+                      <button onClick={() => navigate(`${AppRoute.Player}/${activeFilm?.id}`)} className="btn btn--play film-card__button" type="button">
                         <svg viewBox="0 0 19 19" width="19" height="19">
                           <use xlinkHref="#play-s"></use>
                         </svg>
                         <span>Play</span>
                       </button>
-                      <MyListButton film={film} />
-                      {authStatus === AuthorizationStatus.Auth ?
-                        <Link to={`${AppRoute.film}/${film.id}${AppRoute.AddReview}`} className="btn film-card__button">Add review</Link> :
-                        null}
+                      {isLoggedIn
+                        ?
+                        <Link to={`${AppRoute.Film}/${activeFilm.id}${AppRoute.AddReview}`} className="btn film-card__button">
+                          Add review
+                        </Link>
+                        : null}
                     </div>
                   </div>
                 </div>
@@ -89,7 +93,7 @@ export default function FilmScreen({ films }: FilmScreenProp): JSX.Element {
               <section className="catalog catalog--like-this">
                 <h2 className="catalog__title">More like this</h2>
 
-                <FilmsList films={similar} />
+                <FilmsList films={similar} pageSize={8} />
               </section>
               <Footer />
             </div>

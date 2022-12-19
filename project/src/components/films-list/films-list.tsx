@@ -1,32 +1,13 @@
+import { BaseSyntheticEvent, useState } from 'react';
 import { Film } from '../../types/types';
-import { BaseSyntheticEvent, useEffect, useState } from 'react';
-import ShowMore from '../show-more/show-more';
-import FilmCard from '../film-card/film-card';
-import { Genre, MAX_FILMS_SHOWN_HOME } from '../../const';
-import { useDispatch } from 'react-redux';
-import { setGenre } from '../../store/films-slice';
-import { AppDispatch } from '../../store/store';
+import { FilmsListLazy } from '../films-list-lazy/films-list';
 
-export type FilmsListProps = {
+type Props = {
   films: Film[];
-  isAtHome?: boolean;
+  pageSize?: number;
 }
-
-export default function FilmsList({ films, isAtHome }: FilmsListProps): JSX.Element {
-  const dispatch = useDispatch<AppDispatch>();
-  const selectGenre = ((genre: string) => dispatch(setGenre(genre)));
-  const filmsFiltered: Film[] = [];
-
-  if (isAtHome) {
-    films?.forEach((film: Film) => {
-      if (selectGenre === Genre.AllGenres || selectGenre === film.genre) {
-        filmsFiltered.push(film);
-      }
-    });
-  }
-
+export default function FilmsList({ films, pageSize }: Props): JSX.Element {
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [filmsShown, setFilmsShown] = useState<number>(Math.min(filmsFiltered.length, MAX_FILMS_SHOWN_HOME));
 
   const handleMouseOver = (evt: BaseSyntheticEvent) => {
     const target = evt.target as Element;
@@ -38,25 +19,8 @@ export default function FilmsList({ films, isAtHome }: FilmsListProps): JSX.Elem
     setActiveId(null);
   };
 
-  const increaseFilmsShown = () => {
-    setFilmsShown(Math.min(filmsFiltered.length, filmsShown + MAX_FILMS_SHOWN_HOME));
-  };
-
-  useEffect(() => {
-    setFilmsShown(Math.min(filmsFiltered.length, MAX_FILMS_SHOWN_HOME));
-  }, [selectGenre, filmsFiltered.length]);
-
-  if (isAtHome) {
-    return (
-      <>
-        <div className="catalog__films-list" onMouseOver={handleMouseOver} onMouseOut={() => setActiveId(null)}>
-          {filmsFiltered.slice(0, filmsShown).map((film: Film) => <FilmCard film={film} isActive={film.id.toString() === activeId} key={film.id} />)}
-        </div>
-        {filmsShown < filmsFiltered.length ? <ShowMore onClick={increaseFilmsShown} /> : null}
-      </>);
-  }
   return (
     <div className="catalog__films-list" onMouseOver={handleMouseOver} onMouseOut={() => setActiveId(null)}>
-      {films?.map((film: Film) => <FilmCard film={film} isActive={film.id.toString() === activeId} key={film.id} />)}
+      <FilmsListLazy activeId={activeId} films={films} pageSize={pageSize} />
     </div>);
 }

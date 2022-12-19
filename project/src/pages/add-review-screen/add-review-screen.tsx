@@ -1,35 +1,42 @@
 import { Helmet } from 'react-helmet-async';
-import { useParams, Link } from 'react-router-dom';
-import { AppRoute } from '../../const';
-import { Film } from '../../types/types';
-import { useDispatch, useSelector } from 'react-redux';
-import { logout, selectUser } from '../../store/auth-slice';
-import { AppDispatch } from '../../store/store';
-import Logo from '../../components/logo/logo';
-import NotFoundScreen from '../not-found-screen/not-found-screen';
+import { useDispatch } from 'react-redux';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import AddReviewForm from '../../components/add-review-form/add-review-form';
+import Logo from '../../components/logo/logo';
+import { AppRoute } from '../../const';
+import { postComment, UserComment } from '../../store/active-film-slice';
+import { AppDispatch } from '../../store/store';
+import { Film } from '../../types/types';
+import NotFoundScreen from '../not-found-screen/not-found-screen';
+import UserPanel from '../user-panel/user-panel';
 
 export type AddReviewScreenProp = {
   films: Film[];
 }
 
 export default function AddReviewScreen({ films }: AddReviewScreenProp): JSX.Element {
+  const params = useParams<{ id: string }>();
+  const filmId = +(params?.id ?? '0');
+  const currentFilm = films.find(({ id }) => id === filmId);
+
+  const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const handleLogoutSubmit = () => { dispatch(logout()); };
-  const user = useSelector(selectUser);
-  const params = useParams();
-  const film = films.find((item: Film) => item.id.toString() === params.id);
-  if (!film) {
-    return <NotFoundScreen />;
-  }
+
+  const submitComment = (comment: UserComment) => {
+    dispatch(postComment({ filmId, comment }));
+    navigate(`${AppRoute.Film}/${filmId}`);
+  };
+
+  if (!currentFilm) { return <NotFoundScreen />; }
+
   return (
-    <section className="film-card film-card--full" style={{ background: film.backgroundColor }}>
+    <section className="film-card film-card--full" style={{ background: currentFilm.backgroundColor }}>
       <Helmet>
-        <title>{film.name}</title>
+        <title>{currentFilm.name}</title>
       </Helmet>
       <div className="film-card__header">
         <div className="film-card__bg">
-          <img src={film.backgroundColor} alt={film.name} />
+          <img src={currentFilm.backgroundColor} alt={currentFilm.name} />
         </div>
 
         <h1 className="visually-hidden">WTW</h1>
@@ -39,45 +46,25 @@ export default function AddReviewScreen({ films }: AddReviewScreenProp): JSX.Ele
           <nav className="breadcrumbs">
             <ul className="breadcrumbs__list">
               <li className="breadcrumbs__item">
-                <Link to={`${AppRoute.Film}/${film.id}`} className="breadcrumbs__link">{film.name}</Link>
+                <Link to={`${AppRoute.Film}/${currentFilm.id}`} className="breadcrumbs__link">{currentFilm.name}</Link>
               </li>
               <li className="breadcrumbs__item">
-                <a className="breadcrumbs__link">Add review</a>
+                <div className="breadcrumbs__link">Add review</div>
               </li>
             </ul>
           </nav>
 
-          {user ?
-            <ul className="user-block">
-              <li className="user-block__item">
-                <div className="user-block__avatar">
-                  <img src={user.avatarUrl} alt="User avatar" width="63" height="63" />
-                </div>
-              </li>
-              <li className="user-block__item">
-                <div className="user-block__link"
-                  onClick={handleLogoutSubmit}
-                >Sign out
-                </div>
-              </li>
-            </ul>
-            :
-            <ul className="user-block">
-              <li className="user-block__item">
-                <Link to={AppRoute.Login} className="user-block__link">Log in</Link>
-              </li>
-            </ul>}
-          {/* можно только при токене */}
+          <UserPanel />
         </header>
 
         <div className="film-card__poster film-card__poster--small">
-          <img src={film.posterImage} alt={`${film.name} poster`} width="218"
+          <img src={currentFilm.posterImage} alt={`${currentFilm.name} poster`} width="218"
             height="327"
           />
         </div>
       </div>
 
-      <AddReviewForm />
+      <AddReviewForm onSubmit={submitComment} />
     </section>
   );
 }

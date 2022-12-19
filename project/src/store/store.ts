@@ -1,13 +1,21 @@
-import { Action, AnyAction, configureStore, ThunkAction, ThunkDispatch } from '@reduxjs/toolkit';
+import {
+  Action,
+  AnyAction,
+  configureStore,
+  ThunkAction,
+  ThunkDispatch,
+} from '@reduxjs/toolkit';
+import activeFilmReducer from './active-film-slice';
+import authReducer from './auth-slice';
 import filmsReducer from './films-slice';
 import uiReducer from './ui-slice';
-import authReducer from './auth-slice';
 
 export const store = configureStore({
   reducer: {
     filmsStore: filmsReducer,
     uiStore: uiReducer,
     authStore: authReducer,
+    activeFilmStore: activeFilmReducer,
   },
 });
 

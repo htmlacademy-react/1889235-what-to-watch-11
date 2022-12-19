@@ -1,16 +1,16 @@
 import { Helmet } from 'react-helmet-async';
-import { Film } from '../../types/types';
-import { GenresList } from '../../components/genres-list/genres-list';
-import { Link, useNavigate } from 'react-router-dom';
-import { AppRoute } from '../../const';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectIsLoading } from '../../store/ui-slice';
-import { logout, selectUser } from '../../store/auth-slice';
-import { AppDispatch } from '../../store/store';
-import Logo from '../../components/logo/logo';
-import Footer from '../../components/footer/footer';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import FilmsList from '../../components/films-list/films-list';
+import Footer from '../../components/footer/footer';
+import { GenresList } from '../../components/genres-list/genres-list';
+import Logo from '../../components/logo/logo';
 import Spinner from '../../components/spinner/spinner';
+import { AppRoute } from '../../const';
+import { selectUser } from '../../store/auth-slice';
+import { selectIsLoading } from '../../store/ui-slice';
+import { Film } from '../../types/types';
+import UserPanel from '../user-panel/user-panel';
 
 export type MainScreenProps = {
   featuredFilm: Film;
@@ -20,8 +20,6 @@ export type MainScreenProps = {
 export default function MainScreen({ featuredFilm, films }: MainScreenProps): JSX.Element {
   const navigate = useNavigate();
   const isLoading = useSelector(selectIsLoading);
-  const dispatch = useDispatch<AppDispatch>();
-  const handleLogoutSubmit = () => { dispatch(logout()); };
   const user = useSelector(selectUser);
 
   if (isLoading) {
@@ -42,26 +40,7 @@ export default function MainScreen({ featuredFilm, films }: MainScreenProps): JS
 
         <header className="page-header film-card__head">
           <Logo />
-          {user ?
-            <ul className="user-block">
-              <li className="user-block__item">
-                <div className="user-block__avatar">
-                  <img src={user.avatarUrl} alt="User avatar" width="63" height="63" />
-                </div>
-              </li>
-              <li className="user-block__item">
-                <div className="user-block__link"
-                  onClick={handleLogoutSubmit}
-                >Sign out
-                </div>
-              </li>
-            </ul>
-            :
-            <ul className="user-block">
-              <li className="user-block__item">
-                <Link to={AppRoute.Login} className="user-block__link">Log in</Link>
-              </li>
-            </ul>}
+          <UserPanel />
         </header>
 
         <div className="film-card__wrap">
@@ -84,13 +63,19 @@ export default function MainScreen({ featuredFilm, films }: MainScreenProps): JS
                   </svg>
                   <span>Play</span>
                 </button>
-                <button className="btn btn--list film-card__button" type="button">
-                  <svg viewBox="0 0 19 20" width="19" height="20">
-                    <use xlinkHref="#add"></use>
-                  </svg>
-                  <span>My list</span>
-                  <span className="film-card__count">{films.length}</span>
-                </button>
+                {
+                  !!user &&
+                  <div
+                    className="btn btn--list film-card__button"
+                    onClick={() => { navigate(AppRoute.MyList); }}
+                  >
+                    <svg viewBox="0 0 19 20" width="19" height="20">
+                      <use xlinkHref="#add"></use>
+                    </svg>
+                    <span>My list</span>
+                    <span className="film-card__count">{films.length}</span>
+                  </div>
+                }
               </div>
             </div>
           </div>
@@ -103,7 +88,7 @@ export default function MainScreen({ featuredFilm, films }: MainScreenProps): JS
           <GenresList films={films} />
 
           <div className="catalog__films-list">
-            <FilmsList films={films} />
+            <FilmsList films={films} pageSize={8} />
           </div>
         </section>
         <Footer />
