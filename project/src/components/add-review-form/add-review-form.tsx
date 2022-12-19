@@ -2,7 +2,7 @@ import { ChangeEvent, Fragment, useState } from 'react';
 import { UserComment } from '../../store/active-film-slice';
 
 
-export default function AddReviewForm({ onSubmit }: { onSubmit: (comment: UserComment) => void; }): JSX.Element {
+export default function AddReviewForm({ onSubmit }: { onSubmit: (comment: UserComment) => void }): JSX.Element {
   const [formState, setFormState] = useState<UserComment>({
     rating: 0,
     comment: ''

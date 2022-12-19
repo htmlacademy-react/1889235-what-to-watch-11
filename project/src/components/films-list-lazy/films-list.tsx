@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Film } from '../../types/types';
 import FilmCard from '../film-card/film-card';
 import ShowMore from '../show-more/show-more';
@@ -14,25 +14,29 @@ export function FilmsListLazy({ films: allFilms, activeId, pageSize }: Props): J
   const [canShowMore, setCanShowMore] = useState(true);
   const [visibleFilms, setVisibleFilms] = useState<Film[]>([]);
 
-  useEffect(() => {
-    if (allFilms.length) { showMore(); }
-  }, [allFilms]);
-
-  const showMore = () => {
+  const showMore = useCallback(() => {
     let newEndIndex = visibleFilms.length + size;
     if (newEndIndex > allFilms.length) {
       newEndIndex = allFilms.length;
       setCanShowMore(false);
     }
     setVisibleFilms(allFilms.slice(0, newEndIndex));
-  }
+  }, [allFilms, size, visibleFilms.length]);
 
-  return <>{visibleFilms.map((film) =>
-    <FilmCard
-      key={film.id}
-      film={film}
-      isActive={film.id === +(activeId ?? '')}
-    />)}
-    {canShowMore && <ShowMore onClick={showMore} />}
-  </>
+  useEffect(() => {
+    if (allFilms.length) { showMore(); }
+  }, [allFilms, showMore]);
+
+  return (
+    <>
+      {visibleFilms.map((film) => (
+        <FilmCard
+          key={film.id}
+          film={film}
+          isActive={film.id === +(activeId ?? '')}
+        />
+      )
+      )}
+      {canShowMore && <ShowMore onClick={showMore} />}
+    </>);
 }

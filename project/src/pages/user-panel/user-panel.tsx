@@ -10,7 +10,8 @@ export default function UserPanel(): JSX.Element {
   const user = useSelector(selectUser);
 
   return (user
-    ? <ul className="user-block">
+    ?
+    <ul className="user-block">
       < li className="user-block__item" >
         <div className="user-block__avatar">
           <img src={user.avatarUrl} alt="User avatar" width="63" height="63" />
@@ -23,7 +24,8 @@ export default function UserPanel(): JSX.Element {
         </div>
       </li>
     </ul >
-    : <ul className="user-block">
+    :
+    <ul className="user-block">
       <li className="user-block__item">
         <Link to={AppRoute.Login} className="user-block__link">Log in</Link>
       </li>

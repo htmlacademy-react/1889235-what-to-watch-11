@@ -23,7 +23,6 @@ type Props = {
   reviews: Review[];
 }
 export default function FilmReviews({ reviews }: Props): JSX.Element {
-  console.log({ reviews });
   return (
     <div className="film-card__reviews film-card__row">
       <div className="film-card__reviews-col">

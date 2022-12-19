@@ -2,10 +2,10 @@ import {
   createAsyncThunk,
   createDraftSafeSelector,
   createSlice,
-} from "@reduxjs/toolkit";
-import baseApi from "../api/api";
-import { Film, Review } from "../types/types";
-import { RootState } from "./store";
+} from '@reduxjs/toolkit';
+import baseApi from '../api/api';
+import { Film, Review } from '../types/types';
+import { RootState } from './store';
 
 type ActiveFilmState = {
   film: Film | null;
@@ -13,7 +13,7 @@ type ActiveFilmState = {
   reviews: Review[];
 };
 
-export type UserComment = Pick<Review, "comment" | "rating">;
+export type UserComment = Pick<Review, 'comment' | 'rating'>;
 
 export const initialState: ActiveFilmState = {
   film: null,
@@ -22,7 +22,7 @@ export const initialState: ActiveFilmState = {
 };
 
 export const fetchFilm = createAsyncThunk(
-  "fetchFilm",
+  'fetchFilm',
   async (filmId: number) => {
     const response = await baseApi.get<Film>(`/films/${filmId}`);
     return response.data;
@@ -30,7 +30,7 @@ export const fetchFilm = createAsyncThunk(
 );
 
 export const fetchSimilarFilms = createAsyncThunk(
-  "fetchSimilarFilms",
+  'fetchSimilarFilms',
   async (filmId: number) => {
     const response = await baseApi.get<Film[]>(`/films/${filmId}/similar`);
     return response.data;
@@ -38,25 +38,24 @@ export const fetchSimilarFilms = createAsyncThunk(
 );
 
 export const fetchReviews = createAsyncThunk(
-  "fetchReviews",
+  'fetchReviews',
   async (filmId: number) =>
     (await baseApi.get<Review[]>(`/comments/${filmId}`)).data
 );
 
 export const postComment = createAsyncThunk(
-  "postComment",
+  'postComment',
   async ({ filmId, comment }: { filmId: number; comment: UserComment }) => {
     const response = await baseApi.post<Review[]>(
       `/comments/${filmId}`,
       comment
     );
-    //только при токене
     return response.data;
   }
 );
 
 export const activeFilmSlice = createSlice({
-  name: "active",
+  name: 'active',
   initialState: initialState,
   reducers: {},
   extraReducers: (builder) => {
