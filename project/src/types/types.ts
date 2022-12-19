@@ -28,4 +28,3 @@ export type Review = {
     name: string;
   };
 }
-

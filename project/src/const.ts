@@ -5,6 +5,9 @@ export enum AppRoute {
   MyList = '/mylist',
   Login = '/login',
   Root = '/',
+  NotFound = '/not-found',
+  Reviews = '/reviews',
+  Details = '/details',
 }
 
 export enum AuthorizationStatus {
@@ -14,7 +17,7 @@ export enum AuthorizationStatus {
 }
 
 
-export enum GenresEnum {
+export enum Genre {
   AllGenres = 'AllGenres',
   Comedy = 'Comedy',
   Crime = 'Crime',
@@ -27,3 +30,12 @@ export enum GenresEnum {
   Thrillers = 'Thrillers',
   film = 'film'
 }
+
+export enum FilmScreenTab {
+  Overview,
+  Details,
+  Reviews
+}
+
+export const MAX_FILMS_SHOWN_HOME = 8;
+

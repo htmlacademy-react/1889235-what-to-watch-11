@@ -1,22 +1,37 @@
-import { Film } from '../../types/types';
-import { useParams } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import Spinner from '../../components/spinner/spinner';
+import { fetchFilm, selectActiveFilm } from '../../store/active-film-slice';
+import { AppDispatch } from '../../store/store';
+import { selectIsLoading } from '../../store/ui-slice';
 import NotFoundScreen from '../not-found-screen/not-found-screen';
 
-export type PlayerScreenProps = {
-  films: Film[];
-}
+export default function PlayerScreen(): JSX.Element {
 
-export default function PlayerScreen({ films }: PlayerScreenProps): JSX.Element {
   const params = useParams();
-  const film = films.find((item: Film) => item.id.toString() === params.id);
-  if (!film) {
+  const filmId = params.id && Number.isInteger(+params.id) ? +params.id : undefined;
+  const film = useSelector(selectActiveFilm);
+  const isLoading = useSelector(selectIsLoading);
+  const videoElRef = useRef<HTMLVideoElement>(null);
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  useEffect(() => {
+    if (filmId && film?.id !== filmId) {
+      dispatch(fetchFilm(filmId));
+    }
+  }, [dispatch, film?.id, filmId]);
+
+  if (isLoading) { return <Spinner />; }
+  if (!filmId || !film) {
     return <NotFoundScreen />;
   }
   return (
     <div className="player" >
-      <video src="#" className="player__video" poster={film.backgroundImage}></video>
+      <video ref={videoElRef} src={film.videoLink} className="player__video" poster={film.backgroundImage}></video>
 
-      <button type="button" className="player__exit">Exit</button>
+      <button onClick={() => navigate('/')} type="button" className="player__exit">Exit</button>
 
       <div className="player__controls">
         <div className="player__controls-row">
@@ -28,7 +43,11 @@ export default function PlayerScreen({ films }: PlayerScreenProps): JSX.Element 
         </div>
 
         <div className="player__controls-row">
-          <button type="button" className="player__play">
+          <button
+            type="button"
+            className="player__play"
+            onClick={() => { videoElRef.current?.play(); }}
+          >
             <svg viewBox="0 0 19 19" width="19" height="19">
               <use xlinkHref="#play-s"></use>
             </svg>
@@ -47,3 +66,4 @@ export default function PlayerScreen({ films }: PlayerScreenProps): JSX.Element 
     </div>
   );
 }
+

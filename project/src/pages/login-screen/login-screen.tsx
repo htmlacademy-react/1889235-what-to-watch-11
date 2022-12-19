@@ -1,7 +1,27 @@
 import { Helmet } from 'react-helmet-async';
+import { useState, ChangeEvent } from 'react';
+import { useDispatch } from 'react-redux';
+import { login } from '../../store/auth-slice';
+import { Link } from 'react-router-dom';
+import { AppRoute } from '../../const';
+import { AppDispatch } from '../../store/store';
 import Logo from '../../components/logo/logo';
 
+const defaultUser = {
+  'email': 'Oliver.conner@gmail.com',
+  'password': '12345678'
+};
+
 export default function LoginScreen(): JSX.Element {
+  const [formState, setFormState] = useState(defaultUser);
+
+  function handleFieldChange({ target }: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void {
+    const { name, value } = target;
+    setFormState({ ...formState, [name]: value });
+  }
+  const dispatch = useDispatch<AppDispatch>();
+  const handleLoginSubmit = () => { dispatch(login(formState)); };
+
   return (
     <div className="user-page">
       <Helmet>
@@ -16,16 +36,25 @@ export default function LoginScreen(): JSX.Element {
         <form action="#" className="sign-in__form">
           <div className="sign-in__fields">
             <div className="sign-in__field">
-              <input className="sign-in__input" type="email" placeholder="Email address" name="user-email" id="user-email" />
+              <input className="sign-in__input" type="email" placeholder="Email address" name="email" id="user-email"
+                onChange={handleFieldChange}
+                value={formState.email}
+              />
               <label className="sign-in__label visually-hidden" htmlFor="user-email">Email address</label>
             </div>
             <div className="sign-in__field">
-              <input className="sign-in__input" type="password" placeholder="Password" name="user-password" id="user-password" />
+              <input className="sign-in__input" type="password" placeholder="Password" name="password" id="user-password"
+                onChange={handleFieldChange}
+                value={formState.password}
+              />
               <label className="sign-in__label visually-hidden" htmlFor="user-password">Password</label>
             </div>
           </div>
           <div className="sign-in__submit">
-            <button className="sign-in__btn" type="submit">Sign in</button>
+            <Link to={AppRoute.Root} className="sign-in__btn"
+              onClick={handleLoginSubmit}
+            >Sign in
+            </Link>
           </div>
         </form>
       </div>

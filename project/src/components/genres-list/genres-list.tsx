@@ -1,36 +1,28 @@
-import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { getFilmsByGenre } from '../../store/films/films-slice';
-import { Film } from '../../types/types';
 import { Link } from 'react-router-dom';
-import { GenresEnum } from '../../const';
+import { setGenre } from '../../store/films-slice';
+import { AppDispatch } from '../../store/store';
+import { Film } from '../../types/types';
 
 type GenresListProps = {
-  // selectedGenre: string;
   films: Film[];
 }
 
 export function GenresList({ films }: GenresListProps) {
-  // useSelector((state: RootState) => state.films.films);
-  const dispatch = useDispatch();
-  const selectGenre = ((genre: string) => () => { dispatch(getFilmsByGenre(genre)); });
-  const genres = films.map((film) => (film.genre));
+  const dispatch = useDispatch<AppDispatch>();
+  const selectGenre = ((genre: string | null) => () => dispatch(setGenre(genre)));
+  const genres = films.map((film) => film.genre);
   const uniqueGenres = [...new Set(genres)];
-
-  useEffect(() => {
-    dispatch(getFilmsByGenre('AllGenres'));
-  }, [dispatch]);
 
   return (
     <ul className="catalog__genres-list" >
       <li className="catalog__genres-item catalog__genres-item--active">
-        <Link
-          to="#"
+        <div
           className="catalog__genres-link"
-          onClick={selectGenre(GenresEnum.AllGenres)}
+          onClick={selectGenre(null)}
         >
           All genres
-        </Link>
+        </div>
       </li>
       {uniqueGenres.map((genre) => (
         <li key={genre} className="catalog__genres-item catalog__genres-item--active">

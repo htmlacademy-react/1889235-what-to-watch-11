@@ -1,12 +1,12 @@
-import { Film } from '../../types/types';
 import { BaseSyntheticEvent, useState } from 'react';
-import FilmCard from '../film-card/film-card';
+import { Film } from '../../types/types';
+import { FilmsListLazy } from '../films-list-lazy/films-list';
 
-export type FilmsListProps = {
+type Props = {
   films: Film[];
+  pageSize?: number;
 }
-
-export default function FilmsList({ films }: FilmsListProps): JSX.Element {
+export default function FilmsList({ films, pageSize }: Props): JSX.Element {
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const handleMouseOver = (evt: BaseSyntheticEvent) => {
@@ -21,7 +21,6 @@ export default function FilmsList({ films }: FilmsListProps): JSX.Element {
 
   return (
     <div className="catalog__films-list" onMouseOver={handleMouseOver} onMouseOut={() => setActiveId(null)}>
-      {films.map((film: Film) => <FilmCard film={film} isActive={film.id.toString() === activeId} key={film.id} />)}
-    </div>
-  );
+      <FilmsListLazy activeId={activeId} films={films} pageSize={pageSize} />
+    </div>);
 }
