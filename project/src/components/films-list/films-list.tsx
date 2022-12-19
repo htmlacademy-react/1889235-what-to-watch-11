@@ -1,17 +1,12 @@
-import { Film } from '../../types/types';
 import { BaseSyntheticEvent, useState } from 'react';
-import FilmCard from '../film-card/film-card';
-import ShowMore from '../show-more/show-more';
-import { useDispatch } from 'react-redux';
-import { setGenre } from '../../store/films/films-slice';
+import { Film } from '../../types/types';
+import { FilmsListLazy } from '../films-list-lazy/films-list';
 
-export type FilmsListProps = {
+type Props = {
   films: Film[];
+  pageSize?: number;
 }
-
-export default function FilmsList({ films }: FilmsListProps): JSX.Element {
-  const dispatch = useDispatch();
-  const handleShowMore = () => dispatch(setGenre(null));
+export default function FilmsList({ films, pageSize }: Props): JSX.Element {
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const handleMouseOver = (evt: BaseSyntheticEvent) => {
@@ -26,8 +21,6 @@ export default function FilmsList({ films }: FilmsListProps): JSX.Element {
 
   return (
     <div className="catalog__films-list" onMouseOver={handleMouseOver} onMouseOut={() => setActiveId(null)}>
-      {films.map((film: Film) => <FilmCard film={film} isActive={film.id.toString() === activeId} key={film.id} />)}
-      <ShowMore onClick={handleShowMore} />
-    </div>
-  );
+      <FilmsListLazy activeId={activeId} films={films} pageSize={pageSize} />
+    </div>);
 }

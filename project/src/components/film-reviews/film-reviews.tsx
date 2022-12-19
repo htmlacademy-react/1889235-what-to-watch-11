@@ -19,15 +19,17 @@ const getReview = (review: Review): JSX.Element => (
   </div>
 );
 
-export default function FilmReviews(reviews: Review[]): JSX.Element {
-  const reviewsArray = Object.values(reviews);
+type Props = {
+  reviews: Review[];
+}
+export default function FilmReviews({ reviews }: Props): JSX.Element {
   return (
     <div className="film-card__reviews film-card__row">
       <div className="film-card__reviews-col">
-        {reviewsArray.slice(reviewsArray.length / 2, reviewsArray.length).map((review) => getReview(review))}
+        {reviews.slice(reviews.length / 2, reviews.length).map((review) => getReview(review))}
       </div>
       <div className="film-card__reviews-col">
-        {reviewsArray.slice(0, reviewsArray.length / 2).map((review) => getReview(review))}
+        {reviews.slice(0, reviews.length / 2).map((review) => getReview(review))}
       </div>
     </div>
   );

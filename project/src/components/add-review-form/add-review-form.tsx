@@ -1,9 +1,10 @@
-import { Fragment, useState, ChangeEvent } from 'react';
+import { ChangeEvent, Fragment, useState } from 'react';
+import { UserComment } from '../../store/active-film-slice';
 
-export default function AddReviewForm(): JSX.Element {
 
-  const [formState, setFormState] = useState({
-    rating: '',
+export default function AddReviewForm({ onSubmit }: { onSubmit: (comment: UserComment) => void }): JSX.Element {
+  const [formState, setFormState] = useState<UserComment>({
+    rating: 0,
     comment: ''
   });
 
@@ -47,7 +48,12 @@ export default function AddReviewForm(): JSX.Element {
           >
           </textarea>
           <div className="add-review__submit">
-            <button className="add-review__btn" type="submit">Post</button>
+            <div
+              className="add-review__btn"
+              onClick={() => { onSubmit(formState); }}
+            >
+              Post
+            </div>
           </div>
 
         </div>

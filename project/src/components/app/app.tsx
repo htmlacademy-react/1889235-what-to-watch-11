@@ -1,26 +1,32 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { HelmetProvider } from 'react-helmet-async';
-import { AuthorizationStatus, AppRoute } from '../../const';
-import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
-import { fetchFilms, selectFimsByGenre } from '../../store/films/films-slice';
-import MainScreen from '../../pages/main-screen/main-screen';
-import LoginScreen from '../../pages/login-screen/login-screen';
-import MyListScreen from '../../pages/my-list-screen/my-list-screen';
-import FilmScreen from '../../pages/film-screen/film-screen';
+import { HelmetProvider } from 'react-helmet-async';
+import { useDispatch, useSelector } from 'react-redux';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { AppRoute, FilmScreenTab } from '../../const';
 import AddReviewScreen from '../../pages/add-review-screen/add-review-screen';
-import PlayerScreen from '../../pages/player-screen/player-screen';
+import FilmScreen from '../../pages/film-screen/film-screen';
+import LoginScreen from '../../pages/login-screen/login-screen';
+import MainScreen from '../../pages/main-screen/main-screen';
+import MyListScreen from '../../pages/my-list-screen/my-list-screen';
 import NotFoundScreen from '../../pages/not-found-screen/not-found-screen';
+import PlayerScreen from '../../pages/player-screen/player-screen';
+import { getUser } from '../../store/auth-slice';
+import { fetchFilms, selectFimsByGenre } from '../../store/films-slice';
+import { AppDispatch } from '../../store/store';
+import FilmTabs from '../film-tabs/film-tabs';
 import PrivateRoute from '../private-route/private-route';
 
-export default function App(): JSX.Element {
-  const filmsByGenre = useSelector(selectFimsByGenre);
-  const filmCard = filmsByGenre[0];
 
-  const dispatch = useDispatch();
+export default function App(): JSX.Element {
+
+  const filmsByGenre = useSelector(selectFimsByGenre);
+  const featuredFilm = filmsByGenre[0];
+
+  const dispatch = useDispatch<AppDispatch>();
+
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    dispatch<any>(fetchFilms());
+    dispatch(fetchFilms());
+    dispatch(getUser());
   }, [dispatch]);
 
   return (
@@ -33,7 +39,7 @@ export default function App(): JSX.Element {
               filmsByGenre && filmsByGenre.length
                 ?
                 <MainScreen
-                  filmCard={filmCard}
+                  featuredFilm={featuredFilm}
                   films={filmsByGenre}
                 />
                 : null
@@ -46,26 +52,30 @@ export default function App(): JSX.Element {
           <Route
             path={AppRoute.MyList}
             element={
-              <PrivateRoute authorizationStatus={AuthorizationStatus.Auth}>
+              <PrivateRoute >
                 <MyListScreen films={filmsByGenre} />
               </PrivateRoute>
             }
           />
           <Route
             path={`${AppRoute.Film}/:id`}
-            element={<FilmScreen films={filmsByGenre} />}
-          />
+            element={<FilmScreen />}
+          >
+            <Route path={''} element={<FilmTabs tab={FilmScreenTab.Overview} />} />
+            <Route path={`${AppRoute.Film}/:id${AppRoute.Details}`} element={<FilmTabs tab={FilmScreenTab.Details} />} />
+            <Route path={`${AppRoute.Film}/:id${AppRoute.Reviews}`} element={<FilmTabs tab={FilmScreenTab.Reviews} />} />
+          </Route>
           <Route
             path={`${AppRoute.Film}/:id${AppRoute.AddReview}`}
             element={
-              <PrivateRoute authorizationStatus={AuthorizationStatus.Auth}>
+              <PrivateRoute >
                 <AddReviewScreen films={filmsByGenre} />
               </PrivateRoute>
             }
           />
           <Route
             path={`${AppRoute.Player}/:id`}
-            element={<PlayerScreen films={filmsByGenre} />}
+            element={<PlayerScreen />}
           />
           <Route
             path='*'
@@ -73,6 +83,6 @@ export default function App(): JSX.Element {
           />
         </Routes>
       </BrowserRouter>
-    </HelmetProvider>
+    </HelmetProvider >
   );
 }

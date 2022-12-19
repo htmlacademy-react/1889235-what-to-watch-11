@@ -1,19 +1,17 @@
 import { createAsyncThunk, createDraftSafeSelector, PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
-import { Film } from '../../types/types';
-import { RootState } from '../store';
-import baseApi from '../../api/api';
+import baseApi from '../api/api';
+import { Film } from '../types/types';
+import { RootState } from './store';
 
 export type FilmsState = {
   genre: string | null;
   films: Film[];
-  filmsByGenre: Film[];
 };
 
 const initialState: FilmsState = {
   genre: '',
   films: [],
-  filmsByGenre: []
 };
 
 export const fetchFilms = createAsyncThunk(
@@ -63,7 +61,7 @@ export const selectGenre = createDraftSafeSelector(
 
 export const selectFimsByGenre = createDraftSafeSelector(
   selectFilmsFeature,
-  (state) => state.films.filter((film) => film.genre === state.genre)
+  (state) => state.films.filter((film) => state.genre ? film.genre === state.genre : true)
 );
 
 export const { setGenre, setFilms } = filmsSlice.actions;
